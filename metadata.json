@@ -1,0 +1,6 @@
+{
+  "name": "Nova Grill",
+  "description": "Expérience culinaire et nocturne immersive au Restaurant · Bar · Lounge · Terrasse Nova Grill à Abomey-Calavi, Bénin.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
