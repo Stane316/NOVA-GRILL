@@ -7,8 +7,11 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Flame, Menu, X, Phone, Volume2, VolumeX, MapPin, Sparkles } from "lucide-react";
 import { NOVA_CONTACT } from "../types";
+import { useSite } from "../lib/context/SiteContext";
 
 export default function Navbar() {
+  const { getMedia } = useSite();
+  const logoMedia = getMedia("logo_main");
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -187,13 +190,23 @@ export default function Navbar() {
         {/* Brand identity */}
         <a href="#hero" className="flex items-center gap-2.5 group">
           <div className="relative w-10 h-10 rounded-full border border-white/10 flex items-center justify-center bg-black/50 group-hover:border-embers-glow/90 transition-all duration-500 overflow-hidden">
-            <motion.div
-              animate={{ scale: [1, 1.08, 1] }}
-              transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-            >
-              <Flame className="w-5 h-5 text-embers-glow group-hover:text-amber-400 transition-colors" />
-            </motion.div>
-            <span className="absolute inset-0 bg-embers-glow/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+            {logoMedia?.media_url ? (
+              <img
+                src={logoMedia.media_url}
+                alt={logoMedia.alt || "Nova Grill Logo"}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <>
+                <motion.div
+                  animate={{ scale: [1, 1.08, 1] }}
+                  transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                >
+                  <Flame className="w-5 h-5 text-embers-glow group-hover:text-amber-400 transition-colors" />
+                </motion.div>
+                <span className="absolute inset-0 bg-embers-glow/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+              </>
+            )}
           </div>
           <div>
             <h1 className="font-display font-bold tracking-[0.25em] text-lg uppercase text-white group-hover:text-amber-100 transition-colors font-sans">

@@ -10,7 +10,7 @@ interface PoeticSeparatorProps {
   quote: string;
   subtext?: string;
   chapterNumber?: string;
-}
+} 
 
 export default function PoeticSeparator({ quote, subtext, chapterNumber }: PoeticSeparatorProps) {
   return (

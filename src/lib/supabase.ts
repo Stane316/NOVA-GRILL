@@ -4,6 +4,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { SiteMedia } from "../types";
 
 const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || "";
 const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "";
@@ -113,8 +114,175 @@ const defaultEventVideos = [
   }
 ];
 
+const defaultSiteMedia: Record<string, Omit<SiteMedia, "id">> = {
+  logo_main: {
+    section_key: "logo_main",
+    media_type: "image",
+    media_url: "", // Empty means text fallback in logo
+    title: "Logo Principal",
+    alt: "Nova Grill Logo"
+  },
+  hero_main: {
+    section_key: "hero_main",
+    media_type: "image",
+    media_url: "/src/assets/images/hero_grill_embers_1779896144555.png",
+    title: "Image d'Arrière-plan du Hero",
+    alt: "Braise ardente closeup"
+  },
+  hero_video: {
+    section_key: "hero_video",
+    media_type: "video",
+    media_url: "https://assets.mixkit.co/videos/preview/mixkit-barman-shaking-metal-shaker-creating-bubbles-34288-large.mp4",
+    title: "Vidéo d'Arrière-plan du Hero",
+    alt: "Mixologue préparant un cocktail"
+  },
+  teaser_media: {
+    section_key: "teaser_media",
+    media_type: "video",
+    media_url: "https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-barbecue-coal-burning-43093-large.mp4",
+    title: "Vidéo Teaser Braise",
+    alt: "Braise en fusion et flamme gril"
+  },
+  creations_01: {
+    section_key: "creations_01",
+    media_type: "image",
+    media_url: "/src/assets/images/hero_grill_embers_1779896144555.png",
+    title: "Signatures: Grillades Chaleureuses",
+    alt: "Grillades et braise"
+  },
+  creations_02: {
+    section_key: "creations_02",
+    media_type: "image",
+    media_url: "/src/assets/images/grill_signature_plate_1779896160419.png",
+    title: "Signatures: Le Célèbre Plat de 5K",
+    alt: "TikTok poulet alloco"
+  },
+  creations_03: {
+    section_key: "creations_03",
+    media_type: "image",
+    media_url: "/src/assets/images/cocktail_glow_1779896178524.png",
+    title: "Signatures: Cocktails de Créateurs",
+    alt: "Freshly made cocktails"
+  },
+  creations_04: {
+    section_key: "creations_04",
+    media_type: "image",
+    media_url: "/src/assets/images/terrasse_dj_vibe_1779896194076.png",
+    title: "Signatures: Ambiance Resto Lounge",
+    alt: "Terrasse sous les lanternes"
+  },
+  ambiance_01: {
+    section_key: "ambiance_01",
+    media_type: "image",
+    media_url: "/src/assets/images/hero_grill_embers_1779896144555.png",
+    title: "Atmosphère: L'Alchimie du Feu",
+    alt: "Braise en fusion"
+  },
+  ambiance_02: {
+    section_key: "ambiance_02",
+    media_type: "image",
+    media_url: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=1200",
+    title: "Atmosphère: Tempête de Glace",
+    alt: "Mixology lounge"
+  },
+  ambiance_03: {
+    section_key: "ambiance_03",
+    media_type: "image",
+    media_url: "/src/assets/images/terrasse_dj_vibe_1779896194076.png",
+    title: "Atmosphère: L'Heure Sauvage",
+    alt: "Terrasse DJ set"
+  },
+  gallery_01: {
+    section_key: "gallery_01",
+    media_type: "image",
+    media_url: "/src/assets/images/hero_grill_embers_1779896144555.png",
+    title: "La Braise en Fusion",
+    alt: "Secret de dorure"
+  },
+  gallery_02: {
+    section_key: "gallery_02",
+    media_type: "image",
+    media_url: "/src/assets/images/grill_signature_plate_1779896160419.png",
+    title: "Le Célèbre Plat de 5K",
+    alt: "Plat généreux"
+  },
+  gallery_03: {
+    section_key: "gallery_03",
+    media_type: "image",
+    media_url: "https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&q=80&w=800",
+    title: "Mixologie à Gogo",
+    alt: "Cocktail preparation"
+  },
+  gallery_04: {
+    section_key: "gallery_04",
+    media_type: "image",
+    media_url: "/src/assets/images/terrasse_dj_vibe_1779896194076.png",
+    title: "Saturday Live Beats",
+    alt: "Terrasse DJ"
+  },
+  gallery_05: {
+    section_key: "gallery_05",
+    media_type: "image",
+    media_url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800",
+    title: "L'Ambiance Cosy",
+    alt: "Tables d'ambiance"
+  },
+  gallery_06: {
+    section_key: "gallery_06",
+    media_type: "image",
+    media_url: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800",
+    title: "Le Souci du Détail",
+    alt: "Grillades de précision"
+  }
+};
+
 export const simulationDB = {
   isSimulated: !isProductionSupabaseSet,
+
+  getSiteMedia: async (): Promise<SiteMedia[]> => {
+    if (supabase) {
+      const { data, error } = await supabase.from("site_media").select("*");
+      if (!error && data && data.length > 0) {
+        const dbMap = new Map<string, SiteMedia>(data.map(m => [m.section_key, m]));
+        return Object.keys(defaultSiteMedia).map(key => {
+          return dbMap.get(key) || { id: `m-${key}`, ...defaultSiteMedia[key] } as SiteMedia;
+        });
+      }
+    }
+    const stored = getLocalStorageItem<Record<string, SiteMedia>>("site_media", {});
+    return Object.keys(defaultSiteMedia).map(key => {
+      return stored[key] || { id: `m-${key}`, ...defaultSiteMedia[key] } as SiteMedia;
+    });
+  },
+
+  saveSiteMedia: async (item: Partial<SiteMedia> & { section_key: string }): Promise<SiteMedia> => {
+    const defaultData = defaultSiteMedia[item.section_key] || { media_type: "image", media_url: "" };
+    const completeItem = {
+      id: item.id || `m-${item.section_key}`,
+      section_key: item.section_key,
+      media_type: item.media_type || defaultData.media_type,
+      media_url: item.media_url || defaultData.media_url,
+      title: item.title || defaultData.title || "",
+      alt: item.alt || defaultData.alt || "",
+      created_at: item.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    } as SiteMedia;
+
+    if (supabase) {
+      const { data, error } = await supabase
+        .from("site_media")
+        .upsert(completeItem, { onConflict: "section_key" })
+        .select()
+        .single();
+      if (!error && data) return data;
+      console.warn("Supabase site_media upsert failed, using fallback simulation", error);
+    }
+
+    const stored = getLocalStorageItem<Record<string, SiteMedia>>("site_media", {});
+    stored[item.section_key] = completeItem;
+    setLocalStorageItem("site_media", stored);
+    return completeItem;
+  },
 
   getSettings: async () => {
     if (supabase) {
@@ -212,11 +380,11 @@ export const simulationDB = {
   },
 
   // Simulated Media Uploads for pure beautiful client testing
-  uploadMedia: async (bucket: string, file: File): Promise<string> => {
+  uploadMedia: async (bucket: string, file: File, folder: string = ""): Promise<string> => {
     if (supabase) {
       const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const filePath = folder ? `${folder}/${fileName}` : `${fileName}`;
 
       const { data, error } = await supabase.storage.from(bucket).upload(filePath, file);
       if (error) throw error;

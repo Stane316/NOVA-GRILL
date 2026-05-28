@@ -9,7 +9,7 @@ import { NOVA_CONTACT } from "../types";
 import { useSite } from "../lib/context/SiteContext";
 
 export default function Footer() {
-  const { settings } = useSite();
+  const { settings } = useSite(); 
   const currentYear = new Date().getFullYear();
 
   return (

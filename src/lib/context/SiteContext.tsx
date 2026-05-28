@@ -5,7 +5,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { simulationDB } from "../supabase";
-import { SpecialtyItem, GalleryItem, EventSchedule, SPECIALTIES, GALLERY_ITEMS, EVENT_SCHEDULE } from "../../types";
+import { SpecialtyItem, GalleryItem, EventSchedule, SPECIALTIES, GALLERY_ITEMS, EVENT_SCHEDULE, SiteMedia } from "../../types";
 
 interface SiteSettings {
   hero_title: string;
@@ -47,13 +47,17 @@ interface SiteContextType {
   gallery: DBGalleryItem[];
   heroMedia: HeroMedia;
   eventVideos: DBEventVideo[];
+  siteMedia: SiteMedia[];
   loading: boolean;
   refreshData: () => Promise<void>;
+  getMedia: (key: string) => SiteMedia | undefined;
+  saveSiteMedia: (item: Partial<SiteMedia> & { section_key: string }) => Promise<void>;
 }
 
 const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
 export function SiteProvider({ children }: { children: ReactNode }) {
+  const [siteMedia, setSiteMedia] = useState<SiteMedia[]>([]);
   const [settings, setSettings] = useState<SiteSettings>({
     hero_title: "Quand les lumières baissent...",
     hero_subtitle: "Le Rituel de la Braise Pure",
@@ -109,15 +113,69 @@ export function SiteProvider({ children }: { children: ReactNode }) {
       const liveGallery = await simulationDB.getGallery();
       const liveHero = await simulationDB.getHeroMedia();
       const liveEvents = await simulationDB.getEventVideos();
+      const liveMedia = await simulationDB.getSiteMedia();
 
       if (liveSettings) setSettings(liveSettings);
-      if (liveGallery && liveGallery.length > 0) setGallery(liveGallery);
       if (liveHero) setHeroMedia(liveHero);
       if (liveEvents && liveEvents.length > 0) setEventVideos(liveEvents);
+      
+      if (liveMedia && liveMedia.length > 0) {
+        setSiteMedia(liveMedia);
+        
+        // Extract gallery-specific keys (gallery_01 to gallery_06) to dynamically populate the gallery component
+        const galleryMedias = liveMedia.filter(m => m.section_key.startsWith("gallery_"));
+        if (galleryMedias.length > 0) {
+          const aspectClasses = [
+            "aspect-[16/10]",
+            "aspect-square",
+            "aspect-[3/4]",
+            "aspect-square",
+            "aspect-[16/11]",
+            "aspect-square"
+          ];
+          const mappedGallery = galleryMedias
+            .filter(m => m.media_url) // Only show items that have media URL
+            .map((m, idx) => ({
+              id: m.id || `gal-${idx + 1}`,
+              type: m.media_type,
+              title: m.title || "Image de la Galerie",
+              media_url: m.media_url,
+              aspect: aspectClasses[idx % aspectClasses.length],
+              order_index: idx
+            }));
+          setGallery(mappedGallery);
+        } else if (liveGallery && liveGallery.length > 0) {
+          setGallery(liveGallery);
+        }
+      } else if (liveGallery && liveGallery.length > 0) {
+        setGallery(liveGallery);
+      }
     } catch (e) {
       console.error("Failed to fetch custom dynamic site settings", e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getMedia = (key: string): SiteMedia | undefined => {
+    return siteMedia.find(m => m.section_key === key);
+  };
+
+  const saveSiteMedia = async (item: Partial<SiteMedia> & { section_key: string }) => {
+    try {
+      const updated = await simulationDB.saveSiteMedia(item);
+      setSiteMedia(prev => {
+        const idx = prev.findIndex(m => m.section_key === item.section_key);
+        if (idx > -1) {
+          const copy = [...prev];
+          copy[idx] = updated;
+          return copy;
+        }
+        return [...prev, updated];
+      });
+    } catch (e) {
+      console.error("Failed to save site media item", e);
+      throw e;
     }
   };
 
@@ -126,7 +184,19 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <SiteContext.Provider value={{ settings, gallery, heroMedia, eventVideos, loading, refreshData }}>
+    <SiteContext.Provider
+      value={{
+        settings,
+        gallery,
+        heroMedia,
+        eventVideos,
+        siteMedia,
+        loading,
+        refreshData,
+        getMedia,
+        saveSiteMedia
+      }}
+    >
       {children}
     </SiteContext.Provider>
   );

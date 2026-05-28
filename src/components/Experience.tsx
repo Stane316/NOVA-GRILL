@@ -7,9 +7,16 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles, Music, Flame, GlassWater, Landmark } from "lucide-react";
 import { IMAGES } from "../types";
+import { useSite } from "../lib/context/SiteContext";
+import DynamicMedia from "./media/DynamicMedia";
 
 export default function Experience() {
   const [activeMood, setActiveMood] = useState("braise");
+  const { getMedia } = useSite();
+
+  const ambiance01 = getMedia("ambiance_01");
+  const ambiance02 = getMedia("ambiance_02");
+  const ambiance03 = getMedia("ambiance_03");
 
   const moods = [
     {
@@ -17,7 +24,7 @@ export default function Experience() {
       tabTitle: "L'Alchimie du Feu",
       motto: "Braises ardentes & Saveurs fumées",
       description: "Le clapotis des huiles épicées sur le gril ardent. Une fumée subtile parfumée qui sublime les chaires dorées sous les yeux de nos chefs. C'est l'âme rustique de Calavi.",
-      bgImage: IMAGES.heroEmbers,
+      bgImage: ambiance01?.media_url || IMAGES.heroEmbers,
       icon: Flame,
       color: "from-orange-600/30",
       accent: "text-orange-500"
@@ -27,7 +34,7 @@ export default function Experience() {
       tabTitle: "Tempête de Glace",
       motto: "Mixologie tropicale rafraîchissante",
       description: "Les shakers frappent au rythme du lounge bar. Des cocktails givrés aux fruits frais cueillis du Bénin, glacés à souhait pour tempérer l'ardeur du gril.",
-      bgImage: IMAGES.loungeBar,
+      bgImage: ambiance02?.media_url || IMAGES.loungeBar,
       icon: GlassWater,
       color: "from-cyan-600/30",
       accent: "text-cyan-400"
@@ -37,7 +44,7 @@ export default function Experience() {
       tabTitle: "L'Heure Sauvage",
       motto: "Le spot social favori d'Abomey-Calavi",
       description: "À mesure que la nuit s'installe, les lumières s'adoucissent. Les rires se mêlent aux vibrations acoustiques, créant le plus chaleureux lounge club en plein air du Bénin.",
-      bgImage: IMAGES.terrasseDJ,
+      bgImage: ambiance03?.media_url || IMAGES.terrasseDJ,
       icon: Music,
       color: "from-amber-600/30",
       accent: "text-amber-500"
@@ -63,10 +70,9 @@ export default function Experience() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="w-full h-full absolute inset-0"
           >
-            <img
-              src={currentMood.bgImage}
+            <DynamicMedia
+              url={currentMood.bgImage}
               alt={currentMood.tabTitle}
-              referrerPolicy="no-referrer"
               className="w-full h-full object-cover brightness-[0.22] contrast-[1.12]"
             />
           </motion.div>

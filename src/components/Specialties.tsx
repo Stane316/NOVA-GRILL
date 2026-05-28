@@ -6,8 +6,11 @@
 import { motion } from "motion/react";
 import { Sparkles, ArrowDownRight, Award, Flame, FlameKindling } from "lucide-react";
 import { SPECIALTIES } from "../types";
+import { useSite } from "../lib/context/SiteContext";
+import DynamicMedia from "./media/DynamicMedia";
 
 export default function Specialties() {
+  const { getMedia } = useSite();
   return (
     <section
       id="specialties"
@@ -61,14 +64,22 @@ export default function Specialties() {
                     {/* Shadow masking */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent z-10" />
                     
-                    <motion.img
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                      src={item.image}
-                      alt={item.title}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover transition-all duration-700 scale-100 group-hover:scale-105"
-                    />
+                    {(() => {
+                      const mediaItem = getMedia(`creations_0${idx + 1}`);
+                      return (
+                        <motion.div
+                          whileHover={{ scale: 1.03 }}
+                          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                          className="w-full h-full"
+                        >
+                          <DynamicMedia
+                            url={mediaItem?.media_url || item.image}
+                            alt={item.title}
+                            className="w-full h-full object-cover transition-all duration-700"
+                          />
+                        </motion.div>
+                      );
+                    })()}
 
                     {/* Creative absolute category floating tag */}
                     <span className="absolute top-6 left-6 z-20 bg-embers-dark/80 backdrop-blur-md border border-white/10 text-embers-glow font-mono text-[9px] tracking-[0.2em] uppercase px-3.5 py-1.5 rounded-full">

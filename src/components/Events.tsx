@@ -11,7 +11,7 @@ export default function Events() {
   const highlightedEvent = EVENT_SCHEDULE.find((evt) => evt.highlight);
   const generalEvents = EVENT_SCHEDULE.filter((evt) => !evt.highlight);
 
-  return (
+  return ( 
     <section
       id="events"
       className="relative py-12 sm:py-16 bg-[#0B0908] text-luxury-cream overflow-hidden"

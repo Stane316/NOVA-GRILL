@@ -11,7 +11,9 @@ import { useSite } from "../lib/context/SiteContext";
 import DynamicMedia from "./media/DynamicMedia";
 
 export default function Hero() {
-  const { settings, heroMedia } = useSite();
+  const { settings, getMedia } = useSite();
+  const heroMainMedia = getMedia("hero_main");
+  const heroVideo = getMedia("hero_video");
   const [beninTime, setBeninTime] = useState("");
   const [status, setStatus] = useState({ isOpen: true, label: "Ouvert jusqu'à 01:00" });
 
@@ -63,8 +65,8 @@ export default function Hero() {
           className="w-full h-full relative"
         >
           <DynamicMedia
-            url={heroMedia.video_url || heroMedia.poster_url || IMAGES.heroEmbers}
-            poster={heroMedia.poster_url || IMAGES.heroEmbers}
+            url={heroVideo?.media_url || heroMainMedia?.media_url || IMAGES.heroEmbers}
+            poster={heroMainMedia?.media_url || IMAGES.heroEmbers}
             className="w-full h-full object-cover brightness-[0.4] contrast-[1.12]"
           />
         </motion.div>

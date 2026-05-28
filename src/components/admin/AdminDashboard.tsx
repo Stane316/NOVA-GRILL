@@ -19,9 +19,9 @@ interface AdminDashboardProps {
 }
 
 export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const { settings, gallery, heroMedia, eventVideos, refreshData } = useSite();
+  const { settings, gallery, heroMedia, eventVideos, siteMedia, refreshData, saveSiteMedia } = useSite();
 
-  const [activeTab, setActiveTab] = useState<"general" | "hero" | "gallery" | "events" | "supabase">("general");
+  const [activeTab, setActiveTab] = useState<"general" | "hero" | "gallery" | "events" | "supabase" | "site-media">("site-media");
   const [successToast, setSuccessToast] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -299,6 +299,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {/* Navigation Sidebar Drawer */}
         <aside className="w-full md:w-64 shrink-0 flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-x-visible pb-3 md:pb-0 border-b md:border-b-0 border-white/5">
           {[
+            { id: "site-media", label: "CMS Médias Globaux", icon: Image },
             { id: "general", label: "Informations", icon: Settings },
             { id: "hero", label: "Hero Cinématique", icon: PlayCircle },
             { id: "gallery", label: "Galerie Photos/Vidéos", icon: Image },
@@ -326,6 +327,297 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
         {/* Workspace panel content */}
         <main className="flex-1 min-w-0 bg-[#161210]/60 border border-white/5 rounded-3xl p-6 sm:p-8 relative overflow-hidden backdrop-blur-xl">
+
+          {/* TAB: SITE MEDIA CMS SYSTEM (SUPABASE) */}
+          {activeTab === "site-media" && (
+            <div className="flex flex-col gap-6 animate-fadeIn">
+              <div className="border-b border-white/5 pb-4">
+                <h3 className="font-serif text-xl sm:text-2xl font-light text-white flex items-center gap-2">
+                  <Image className="w-5 h-5 text-embers-glow" /> CMS Médias Globaux (Base de Données)
+                </h3>
+                <p className="text-stone-400 text-xs mt-1 font-light">
+                  Administrez l'ensemble des médias du site un par un. Les modifications sont enregistrées en temps réel dans votre table de base de données <code className="bg-black/40 text-rose-400 px-1 py-0.5 rounded font-mono">site_media</code> sur Supabase.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-6">
+                {[
+                  {
+                    key: "logo_main",
+                    label: "Logo du Restaurant (Navbar)",
+                    folder: "logo",
+                    type: "image",
+                    description: "Logo principal de Nova Grill. Laisse vide pour utiliser l'icône de Flamme par défaut."
+                  },
+                  {
+                    key: "hero_main",
+                    label: "Page d'Accueil: Image de Couverture Fallback",
+                    folder: "hero",
+                    type: "image",
+                    description: "Image d'arrière-plan de secours, également utilisée comme poster durant le chargement de la vidéo."
+                  },
+                  {
+                    key: "hero_video",
+                    label: "Page d'Accueil: Vidéo Cinématique en Arrière-plan",
+                    folder: "hero",
+                    type: "video",
+                    description: "Film d'ambiance de fond lu en boucle silencieuse pour immerger immédiatement les convives."
+                  },
+                  {
+                    key: "teaser_media",
+                    label: "Teaser de Ambiance",
+                    folder: "teaser",
+                    type: "video",
+                    description: "Vidéo ou illustration teaser du gril et de la cuisson sur la braise."
+                  },
+                  {
+                    key: "creations_01",
+                    label: "Nos Créations: Spécialité 1 (La Braise)",
+                    folder: "creations",
+                    type: "image",
+                    description: "Couverture de votre première spécialité iconique dans la section Nos Créations."
+                  },
+                  {
+                    key: "creations_02",
+                    label: "Nos Créations: Spécialité 2 (Le Plat de 5K)",
+                    folder: "creations",
+                    type: "image",
+                    description: "Couverture du célèbre plat de 5.000 FCFA mis en avant sur TikTok."
+                  },
+                  {
+                    key: "creations_03",
+                    label: "Nos Créations: Spécialité 3 (Cocktails)",
+                    folder: "creations",
+                    type: "image",
+                    description: "Couverture de la section cocktail et mixologie tropicale rafraîchissante."
+                  },
+                  {
+                    key: "creations_04",
+                    label: "Nos Créations: Spécialité 4 (L'Expérience)",
+                    folder: "creations",
+                    type: "image",
+                    description: "Image illustrant le cadre de fête, afterworks ou événements d'Abomey-Calavi."
+                  },
+                  {
+                    key: "ambiance_01",
+                    label: "Atmosphère: L'Alchimie du Feu (Braise)",
+                    folder: "ambiance",
+                    type: "image",
+                    description: "Arrière-plan haute résolution de l'onglet Braise (Arrière-plan d'atmosphère)."
+                  },
+                  {
+                    key: "ambiance_02",
+                    label: "Atmosphère: Tempête de Glace (Cocktails d'Or)",
+                    folder: "ambiance",
+                    type: "image",
+                    description: "Arrière-plan haute résolution de l'onglet Cocktails (Arrière-plan d'atmosphère)."
+                  },
+                  {
+                    key: "ambiance_03",
+                    label: "Atmosphère: L'Heure Sauvage (DJ Sets)",
+                    folder: "ambiance",
+                    type: "image",
+                    description: "Arrière-plan haute résolution de l'onglet Live Saturdays (Arrière-plan d'atmo)."
+                  },
+                  {
+                    key: "gallery_01",
+                    label: "Galerie: Image 1",
+                    folder: "gallery",
+                    type: "image",
+                    description: "Image n°1 affichée dans la mosaïque dynamique de la galerie."
+                  },
+                  {
+                    key: "gallery_02",
+                    label: "Galerie: Image 2",
+                    folder: "gallery",
+                    type: "image",
+                    description: "Image n°2 affichée dans la mosaïque dynamique de la galerie."
+                  },
+                  {
+                    key: "gallery_03",
+                    label: "Galerie: Image 3",
+                    folder: "gallery",
+                    type: "image",
+                    description: "Image n°3 affichée dans la mosaïque dynamique de la galerie."
+                  },
+                  {
+                    key: "gallery_04",
+                    label: "Galerie: Image 4",
+                    folder: "gallery",
+                    type: "image",
+                    description: "Image n°4 affichée dans la mosaïque dynamique de la galerie."
+                  },
+                  {
+                    key: "gallery_05",
+                    label: "Galerie: Image 5",
+                    folder: "gallery",
+                    type: "image",
+                    description: "Image n°5 affichée dans la mosaïque dynamique de la galerie."
+                  },
+                  {
+                    key: "gallery_06",
+                    label: "Galerie: Image 6",
+                    folder: "gallery",
+                    type: "image",
+                    description: "Image n°6 affichée dans la mosaïque dynamique de la galerie."
+                  }
+                ].map((sec) => {
+                  const itemMedia = siteMedia.find(m => m.section_key === sec.key);
+                  const currentUrl = itemMedia?.media_url || "";
+                  const currentTitle = itemMedia?.title || "";
+                  const currentAlt = itemMedia?.alt || "";
+
+                  return (
+                    <div key={sec.key} className="bg-black/35 border border-white/5 rounded-3xl p-5 sm:p-6 flex flex-col xl:flex-row gap-6 items-stretch">
+                      {/* Visual Preview on the left */}
+                      <div className="w-full xl:w-48 aspect-video xl:aspect-square rounded-2xl overflow-hidden bg-[#0a0a09] relative shrink-0 border border-white/5 flex items-center justify-center">
+                        {currentUrl ? (
+                          <DynamicMedia url={currentUrl} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="text-center font-mono text-[9px] text-[#423d3a] flex flex-col items-center gap-1">
+                            <Flame className="w-5 h-5 opacity-40" />
+                            <span>Aucun média</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Editing Panel */}
+                      <div className="flex-1 flex flex-col justify-between min-w-0">
+                        <div>
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                            <h4 className="font-display font-bold text-xs text-white uppercase tracking-wider">{sec.label}</h4>
+                            <span className="font-mono text-[8px] bg-amber-500/10 text-embers-gold border border-amber-500/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">
+                              KEY: {sec.key}
+                            </span>
+                          </div>
+                          <p className="text-[#8e8580] text-xs font-light mb-4 leading-relaxed">{sec.description}</p>
+                        </div>
+
+                        {/* Dynamic Action Fields */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="flex flex-col gap-1.5 col-span-1 md:col-span-2">
+                            <span className="font-mono text-[8px] uppercase text-zinc-500 tracking-wider">URL du fichier stocké</span>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                id={`url-${sec.key}`}
+                                className="flex-1 bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-stone-200 select-text font-mono"
+                                defaultValue={currentUrl}
+                                placeholder="Ex: https://..."
+                              />
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  const inputVal = (document.getElementById(`url-${sec.key}`) as HTMLInputElement)?.value;
+                                  if (!inputVal) return;
+                                  setIsSaving(true);
+                                  try {
+                                    await saveSiteMedia({
+                                      section_key: sec.key,
+                                      media_url: inputVal,
+                                      media_type: sec.type as any,
+                                      title: currentTitle,
+                                      alt: currentAlt
+                                    });
+                                    triggerToast(`Lien mis à jour pour : ${sec.label}`);
+                                  } catch (err) {
+                                    alert("Une erreur technique s'est produite.");
+                                  } finally {
+                                    setIsSaving(false);
+                                  }
+                                }}
+                                className="bg-embers-glow hover:bg-amber-500 border border-transparent p-2 px-3 rounded-xl text-white flex items-center"
+                                title="Sauvegarder l'adresse"
+                              >
+                                <Save className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Upload File button & metadata setter */}
+                          <div className="flex flex-col gap-2">
+                            <span className="font-mono text-[8px] uppercase text-zinc-500 tracking-wider">Téléchargement Fichier</span>
+                            <input
+                              type="file"
+                              accept={sec.type === "video" ? "video/*" : "image/*"}
+                              id={`file-upload-${sec.key}`}
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setIsSaving(true);
+                                try {
+                                  const publicUrl = await simulationDB.uploadMedia("site-media", file, sec.folder);
+                                  await saveSiteMedia({
+                                    section_key: sec.key,
+                                    media_url: publicUrl,
+                                    media_type: sec.type as any,
+                                    title: currentTitle || sec.label,
+                                    alt: currentAlt || sec.label
+                                  });
+                                  triggerToast(`Fichier téléversé et enregistré pour : ${sec.label}`);
+                                } catch (err: any) {
+                                  console.error(err);
+                                  alert("Échec du téléversement vers Supabase Storage.");
+                                } finally {
+                                  setIsSaving(false);
+                                }
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => document.getElementById(`file-upload-${sec.key}`)?.click()}
+                              className="w-full bg-stone-900 border border-white/5 hover:border-embers-glow py-2.5 px-4 rounded-xl text-[10px] text-stone-300 hover:text-white transition-all font-mono uppercase tracking-widest flex items-center justify-center gap-2"
+                            >
+                              <Upload className="w-3.5 h-3.5 text-embers-gold" />
+                              <span>Télécharger {sec.type === "video" ? "Vidéo" : "Image"}</span>
+                            </button>
+                          </div>
+
+                          <div className="flex flex-col gap-2">
+                            <span className="font-mono text-[8px] uppercase text-zinc-500 tracking-wider">Méta-Données Optionnelles</span>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                id={`title-${sec.key}`}
+                                placeholder="Alt-Text / Titre Alté"
+                                className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-stone-200"
+                                defaultValue={currentAlt}
+                              />
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  const altDesc = (document.getElementById(`title-${sec.key}`) as HTMLInputElement)?.value;
+                                  setIsSaving(true);
+                                  try {
+                                    await saveSiteMedia({
+                                      section_key: sec.key,
+                                      media_url: currentUrl,
+                                      media_type: sec.type as any,
+                                      title: altDesc,
+                                      alt: altDesc
+                                    });
+                                    triggerToast(`Méta-Description enregistrée pour : ${sec.label}`);
+                                  } catch (err) {
+                                    alert("Erreur lors de la sauvegarde.");
+                                  } finally {
+                                    setIsSaving(false);
+                                  }
+                                }}
+                                className="bg-[#2c221c] hover:bg-neutral-800 text-stone-300 hover:text-white border border-white/5 px-3.5 rounded-xl text-xs flex items-center justify-center"
+                              >
+                                Enregistrer
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* TAB 1: GENERAL INFORMATIONS */}
           {activeTab === "general" && (
