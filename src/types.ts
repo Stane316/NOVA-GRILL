@@ -46,9 +46,9 @@ export const NOVA_CONTACT = {
 // Paths to our pristine generated images
 export const IMAGES = {
   heroEmbers: "/src/assets/images/hero_grill_embers_1779896144555.png",
-  signaturePlate: "/src/assets/images/grill_signature_plate_1779896160419.png",
-  cocktailGlow: "/src/assets/images/cocktail_glow_1779896178524.png",
-  terrasseDJ: "/src/assets/images/terrasse_dj_vibe_1779896194076.png",
+  signaturePlate: "/src/assets/images/grill_signature_plate.png",
+  cocktailGlow: "/src/assets/images/cocktail_glow.png",
+  terrasseDJ: "/src/assets/images/terrasse_dj_vibe.png",
   // Backup or additional stylized backgrounds using premium Picsum seeds matching deep gold and black
   loungeBar: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=1200", // Dark chic mixologist bar
   brazierCloseUp: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=1200", // Premium charcoal woodfire
