@@ -9,7 +9,7 @@ import { NOVA_CONTACT } from "../types";
 import { useSite } from "../lib/context/SiteContext";
 
 export default function Footer() {
-  const { settings } = useSite(); 
+  const { settings } = useSite();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -33,7 +33,7 @@ export default function Footer() {
               <a
                 href={settings.tiktok_url || "https://www.tiktok.com/@restaurant.nova.grill"}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full border border-white/10 bg-black/40 flex items-center justify-center text-stone-400 hover:text-rose-500 hover:border-rose-500/30 transition-all duration-300"
                 title="Suivez-nous sur TikTok"
               >
@@ -42,7 +42,7 @@ export default function Footer() {
               <a
                 href="https://instagram.com"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full border border-white/10 bg-black/40 flex items-center justify-center text-stone-400 hover:text-amber-500 hover:border-amber-500/30 transition-all duration-300"
                 title="Suivez-nous sur Instagram"
               >
@@ -129,7 +129,7 @@ export default function Footer() {
               <a
                 href={`https://maps.google.com/?q=${encodeURIComponent(settings.address || "Carrefour Tankpè, Abomey-Calavi, Bénin")}`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="w-full text-center bg-white/5 hover:bg-white/10 text-white border border-white/5 rounded-xl py-2.5 font-display text-[10px] font-semibold tracking-widest uppercase flex items-center justify-center gap-2 transition-all"
               >
                 <Navigation className="w-3.5 h-3.5 text-embers-gold" />

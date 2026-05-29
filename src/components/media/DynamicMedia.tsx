@@ -31,7 +31,6 @@ export default function DynamicMedia({ url, alt = "Nova Grill Media", className 
         muted
         loop
         playsInline
-        referrerPolicy="no-referrer"
         className={`w-full h-full object-cover select-none ${className}`}
       />
     );

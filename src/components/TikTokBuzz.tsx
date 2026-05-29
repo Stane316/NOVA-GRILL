@@ -8,6 +8,14 @@ import { MessageCircle, Heart, Share2, Play, Users, Award, ShieldAlert, Sparkles
 import { IMAGES, NOVA_CONTACT } from "../types";
 import { useSite } from "../lib/context/SiteContext";
 
+interface VideoData {
+  id: string;
+  title: string;
+  video_url: string;
+  thumbnail_url: string;
+  created_at: string;
+}
+
 export default function TikTokBuzz() {
   const { settings, eventVideos } = useSite();
 
@@ -188,7 +196,7 @@ export default function TikTokBuzz() {
           {/* Right Block: Video Mockups with Real Stats (8 Columns) */}
           <div className="lg:col-span-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {eventVideos.map((video, idx) => (
+              {eventVideos.map((video: VideoData, idx: number) => (
                 <div
                   key={video.id}
                   className="bg-[#161210] border border-white/5 rounded-3xl overflow-hidden flex flex-col justify-between group h-full relative hover:border-[#2d221c] transition-all duration-500 text-left"
@@ -202,7 +210,6 @@ export default function TikTokBuzz() {
                       muted
                       loop
                       playsInline
-                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover group-hover:scale-105 duration-700 transition"
                     />
 

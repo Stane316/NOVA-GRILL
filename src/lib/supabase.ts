@@ -256,7 +256,13 @@ export const simulationDB = {
   },
 
   saveSiteMedia: async (item: Partial<SiteMedia> & { section_key: string }): Promise<SiteMedia> => {
-    const defaultData = defaultSiteMedia[item.section_key] || { media_type: "image", media_url: "" };
+    const defaultData = (defaultSiteMedia[item.section_key] || {
+      section_key: item.section_key,
+      media_type: "image",
+      media_url: "",
+      title: "",
+      alt: ""
+    }) as Omit<SiteMedia, "id">;
     const completeItem = {
       id: item.id || `m-${item.section_key}`,
       section_key: item.section_key,

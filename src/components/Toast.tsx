@@ -31,10 +31,10 @@ export default function ToastContainer() {
       const id = Math.random().toString(36).substring(2, 9);
       
       const newToast: ToastMessage = { id, title, message, duration };
-      setToasts((prev) => [...prev, newToast]);
+      setToasts((prev: ToastMessage[]) => [...prev, newToast]);
 
       setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
+        setToasts((prev: ToastMessage[]) => prev.filter((t: ToastMessage) => t.id !== id));
       }, duration);
     };
 
@@ -43,13 +43,13 @@ export default function ToastContainer() {
   }, []);
 
   const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+    setToasts((prev: ToastMessage[]) => prev.filter((t: ToastMessage) => t.id !== id));
   };
 
   return (
     <div className="fixed top-24 right-4 sm:right-8 z-55 flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0">
       <AnimatePresence>
-        {toasts.map((toast) => (
+        {toasts.map((toast: ToastMessage) => (
           <motion.div
             key={toast.id}
             layout
@@ -84,6 +84,8 @@ export default function ToastContainer() {
             <button
               onClick={() => removeToast(toast.id)}
               className="text-stone-500 hover:text-white transition-colors p-1"
+              title="Fermer la notification"
+              aria-label="Fermer la notification"
             >
               <X className="w-4 h-4" />
             </button>

@@ -186,7 +186,7 @@ export default function CinematicIntro({ onComplete }: CinematicIntroProps) {
       opacity: 1,
       transition: {
         duration: 1.5,
-        ease: [0.16, 1, 0.3, 1] // legendary custom ease curve for luxury brands
+        ease: [0.16, 1, 0.3, 1] as any // legendary custom ease curve for luxury brands
       }
     }
   };
@@ -204,7 +204,7 @@ export default function CinematicIntro({ onComplete }: CinematicIntroProps) {
         scale: 0.98,
         transition: {
           duration: 0.65,
-          ease: [0.25, 1, 0.5, 1],
+          ease: [0.25, 1, 0.5, 1] as any,
           delay: reversedIndex * 0.02 // right-to-left organic stagger delay
         }
       };

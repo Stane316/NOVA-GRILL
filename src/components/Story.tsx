@@ -23,7 +23,7 @@ export default function Story() {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.8, ease: "easeOut" }
+      transition: { duration: 0.8, ease: "easeOut" as any }
     }
   };
 

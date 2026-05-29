@@ -5,8 +5,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Calendar, Users, Clock, Flame, CheckCircle2, Phone, Sparkles, MapPin, Copy, Layers } from "lucide-react";
-import { NOVA_CONTACT } from "../types";
+import { Calendar, Users, Clock, Flame, CheckCircle2, Phone, Sparkles, MapPin, Copy } from "lucide-react";
 import { showToast } from "./Toast";
 import { trackGAEvent } from "../lib/analytics";
 
@@ -108,12 +107,14 @@ export default function Reservation() {
                 
                 {/* Full Name Input */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
+                  <label htmlFor="reservation-name-input" className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
                     Nom & Prénom *
                   </label>
                   <input
                     type="text"
                     required
+                    id="reservation-name-input"
+                    title="Nom et Prénom de la personne réservant"
                     placeholder="Ex: Tobi Sanni"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -123,7 +124,7 @@ export default function Reservation() {
 
                 {/* Telephone Input (Pre-formatted with Benin support) */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase flex justify-between">
+                  <label htmlFor="reservation-phone-input" className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase flex justify-between">
                     <span>Numéro de Téléphone (WhatsApp) *</span>
                     <span className="text-embers-glow font-mono text-[9px] lowercase italic font-bold">pré-bloqué +229</span>
                   </label>
@@ -134,6 +135,8 @@ export default function Reservation() {
                     <input
                       type="tel"
                       required
+                      id="reservation-phone-input"
+                      title="Numéro de téléphone portable"
                       placeholder="01 96 13 52 87"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -144,7 +147,7 @@ export default function Reservation() {
 
                 {/* Number of guests Dropdown */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
+                  <label htmlFor="reservation-guests-select" className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
                     Nombre de Personnes
                   </label>
                   <div className="relative">
@@ -152,6 +155,8 @@ export default function Reservation() {
                       <Users className="w-4 h-4" />
                     </span>
                     <select
+                      id="reservation-guests-select"
+                      title="Nombre de Personnes"
                       value={formData.guests}
                       onChange={(e) => setFormData({ ...formData, guests: e.target.value })}
                       className="w-full bg-black border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white focus:outline-none focus:border-embers-glow transition-all appearance-none cursor-pointer"
@@ -168,7 +173,7 @@ export default function Reservation() {
 
                 {/* Seating Area Selection Tabs (Instead of basic select inputs) */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
+                  <label htmlFor="reservation-time-select" className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
                     Heure du Service
                   </label>
                   <div className="relative">
@@ -176,6 +181,8 @@ export default function Reservation() {
                       <Clock className="w-4 h-4" />
                     </span>
                     <select
+                      id="reservation-time-select"
+                      title="Heure du repas"
                       value={formData.time}
                       onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                       className="w-full bg-black border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white focus:outline-none focus:border-embers-glow transition-all appearance-none cursor-pointer font-mono"
@@ -192,7 +199,7 @@ export default function Reservation() {
 
                 {/* Date Selection */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
+                  <label htmlFor="reservation-date-input" className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
                     Choisir une Date
                   </label>
                   <div className="relative">
@@ -202,6 +209,9 @@ export default function Reservation() {
                     <input
                       type="date"
                       required
+                      id="reservation-date-input"
+                      title="Choisir une Date"
+                      placeholder="Sélectionner une date"
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                       className="w-full bg-black border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white focus:outline-none focus:border-embers-glow transition-all font-mono"
@@ -211,11 +221,13 @@ export default function Reservation() {
 
                 {/* Notes Input block */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
+                  <label htmlFor="reservation-notes-input" className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
                     Régime ou Demande Spéciale (Ex: Anniversaire)
                   </label>
                   <input
                     type="text"
+                    id="reservation-notes-input"
+                    title="Demandes ou spécificités particulières"
                     placeholder="Ex: Célébration d'anniversaire, bougies, etc."
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -303,7 +315,7 @@ export default function Reservation() {
               <div className="bg-black border border-white/5 rounded-2xl p-6 mb-8 text-left border-dashed border-zinc-800">
                 <div className="flex justify-between items-center border-b border-white/5 pb-4 mb-4 font-mono text-xs text-zinc-500">
                   <span>TICKET DE TABLE NOVA</span>
-                  <span className="text-embers-glow">STatus: CONFIRMÉ</span>
+                  <span className="text-embers-glow">Status: CONFIRMÉ</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-xs">
@@ -327,7 +339,7 @@ export default function Reservation() {
 
                 {/* Simulated barcode for cinematic design */}
                 <div className="mt-6 pt-4 border-t border-white/5 flex flex-col items-center justify-center gap-2">
-                  <div className="h-8 w-full bg-gradient-to-r from-zinc-900 via-stone-700 to-zinc-900 opacity-30 relative" style={{ backgroundImage: "repeating-linear-gradient(90deg, #fff, #fff 2px, transparent 2px, transparent 8px)" }}></div>
+                  <div className="h-8 w-full bg-gradient-to-r from-zinc-900 via-stone-700 to-zinc-900 opacity-30 relative barcode-repeating-pattern"></div>
                   <span className="font-mono text-[8px] tracking-[0.4em] text-zinc-650 block uppercase">
                     * {bookingRef} *
                   </span>

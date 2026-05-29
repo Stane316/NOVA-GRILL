@@ -7,8 +7,8 @@ import React, { useState, useRef } from "react";
 import { motion } from "motion/react";
 import { 
   LogOut, Settings, Image, Film, Plus, Trash2, Save, Upload, 
-  ExternalLink, ChevronUp, ChevronDown, Check, Sparkles, Database, Info, 
-  RefreshCw, MapPin, Phone, Clock, PlayCircle, Eye, Flame
+  ChevronUp, ChevronDown, Check, Database, Info, 
+  RefreshCw, MapPin, Phone, Clock, PlayCircle, Flame
 } from "lucide-react";
 import { useSite } from "../../lib/context/SiteContext";
 import { simulationDB } from "../../lib/supabase";
@@ -100,7 +100,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setIsSaving(true);
     try {
       const publicUrl = await simulationDB.uploadMedia("hero-media", file);
-      setHeroFields(prev => ({ ...prev, [field]: publicUrl }));
+      setHeroFields((prev: any) => ({ ...prev, [field]: publicUrl }));
       triggerToast(`Fichier téléversé avec succès pour : ${field}`);
     } catch (err: any) {
       alert("Échec du téléversement du fichier.");
@@ -151,7 +151,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       const detectedType = isVideoFile ? "video" : "image";
       const publicUrl = await simulationDB.uploadMedia("gallery", file);
 
-      setNewGalleryItem(prev => ({
+      setNewGalleryItem((prev: any) => ({
         ...prev,
         type: detectedType as "image" | "video",
         media_url: publicUrl,
@@ -229,7 +229,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setEventUploadProgress(true);
     try {
       const publicUrl = await simulationDB.uploadMedia("events", file);
-      setNewEventVideo(prev => ({ ...prev, [field]: publicUrl }));
+      setNewEventVideo((prev: any) => ({ ...prev, [field]: publicUrl }));
       triggerToast(`Média d'événement téléversé : ${field}`);
     } catch (err) {
       alert("Échec du téléversement du média.");
@@ -287,6 +287,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
             onClick={onLogout}
             className="flex items-center gap-2 p-2.5 rounded-full border border-white/5 hover:border-red-900 bg-white/5 text-stone-400 hover:text-white transition-all text-xs font-mono"
             title="Se déconnecter"
+            aria-label="Se déconnecter"
           >
             <LogOut className="w-4 h-4 text-red-500" />
             <span className="sm:inline hidden tracking-[0.1em]">LOGOUT CONTROL</span>
@@ -462,7 +463,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     description: "Image n°6 affichée dans la mosaïque dynamique de la galerie."
                   }
                 ].map((sec) => {
-                  const itemMedia = siteMedia.find(m => m.section_key === sec.key);
+                  const itemMedia = siteMedia.find((m: any) => m.section_key === sec.key);
                   const currentUrl = itemMedia?.media_url || "";
                   const currentTitle = itemMedia?.title || "";
                   const currentAlt = itemMedia?.alt || "";
@@ -496,11 +497,12 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         {/* Dynamic Action Fields */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="flex flex-col gap-1.5 col-span-1 md:col-span-2">
-                            <span className="font-mono text-[8px] uppercase text-zinc-500 tracking-wider">URL du fichier stocké</span>
+                            <label htmlFor={`admin-cms-url-${sec.key}`} className="font-mono text-[8px] uppercase text-zinc-500 tracking-wider block">URL du fichier stocké</label>
                             <div className="flex gap-2">
                               <input
                                 type="text"
-                                id={`url-${sec.key}`}
+                                id={`admin-cms-url-${sec.key}`}
+                                title={`URL du fichier pour ${sec.label}`}
                                 className="flex-1 bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-stone-200 select-text font-mono"
                                 defaultValue={currentUrl}
                                 placeholder="Ex: https://..."
@@ -508,7 +510,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                               <button
                                 type="button"
                                 onClick={async () => {
-                                  const inputVal = (document.getElementById(`url-${sec.key}`) as HTMLInputElement)?.value;
+                                  const inputVal = (document.getElementById(`admin-cms-url-${sec.key}`) as HTMLInputElement)?.value;
                                   if (!inputVal) return;
                                   setIsSaving(true);
                                   try {
@@ -527,7 +529,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                   }
                                 }}
                                 className="bg-embers-glow hover:bg-amber-500 border border-transparent p-2 px-3 rounded-xl text-white flex items-center"
-                                title="Sauvegarder l'adresse"
+                                title={`Sauvegarder l'adresse pour ${sec.label}`}
+                                aria-label={`Sauvegarder l'adresse pour ${sec.label}`}
                               >
                                 <Save className="w-3.5 h-3.5" />
                               </button>
@@ -536,13 +539,14 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
                           {/* Upload File button & metadata setter */}
                           <div className="flex flex-col gap-2">
-                            <span className="font-mono text-[8px] uppercase text-zinc-500 tracking-wider">Téléchargement Fichier</span>
+                            <label htmlFor={`admin-cms-file-upload-${sec.key}`} className="font-mono text-[8px] uppercase text-zinc-500 tracking-wider block">Téléchargement Fichier</label>
                             <input
                               type="file"
                               accept={sec.type === "video" ? "video/*" : "image/*"}
-                              id={`file-upload-${sec.key}`}
+                              id={`admin-cms-file-upload-${sec.key}`}
+                              title={`Télécharger fichier pour ${sec.label}`}
                               className="hidden"
-                              onChange={async (e) => {
+                              onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
                                 const file = e.target.files?.[0];
                                 if (!file) return;
                                 setIsSaving(true);
@@ -566,8 +570,10 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                             />
                             <button
                               type="button"
-                              onClick={() => document.getElementById(`file-upload-${sec.key}`)?.click()}
+                              onClick={() => document.getElementById(`admin-cms-file-upload-${sec.key}`)?.click()}
                               className="w-full bg-stone-900 border border-white/5 hover:border-embers-glow py-2.5 px-4 rounded-xl text-[10px] text-stone-300 hover:text-white transition-all font-mono uppercase tracking-widest flex items-center justify-center gap-2"
+                              title={`Sélectionner un fichier ${sec.type === "video" ? "Vidéo" : "Image"} pour ${sec.label}`}
+                              aria-label={`Sélectionner un fichier ${sec.type === "video" ? "Vidéo" : "Image"} pour ${sec.label}`}
                             >
                               <Upload className="w-3.5 h-3.5 text-embers-gold" />
                               <span>Télécharger {sec.type === "video" ? "Vidéo" : "Image"}</span>
@@ -575,11 +581,12 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           </div>
 
                           <div className="flex flex-col gap-2">
-                            <span className="font-mono text-[8px] uppercase text-zinc-500 tracking-wider">Méta-Données Optionnelles</span>
+                            <label htmlFor={`admin-cms-title-${sec.key}`} className="font-mono text-[8px] uppercase text-zinc-500 tracking-wider block font-bold">Méta-Données Optionnelles</label>
                             <div className="flex gap-2">
                               <input
                                 type="text"
-                                id={`title-${sec.key}`}
+                                id={`admin-cms-title-${sec.key}`}
+                                title={`Méta-données de titre pour ${sec.label}`}
                                 placeholder="Alt-Text / Titre Alté"
                                 className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-stone-200"
                                 defaultValue={currentAlt}
@@ -587,7 +594,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                               <button
                                 type="button"
                                 onClick={async () => {
-                                  const altDesc = (document.getElementById(`title-${sec.key}`) as HTMLInputElement)?.value;
+                                  const altDesc = (document.getElementById(`admin-cms-title-${sec.key}`) as HTMLInputElement)?.value || "";
                                   setIsSaving(true);
                                   try {
                                     await saveSiteMedia({
@@ -605,6 +612,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                   }
                                 }}
                                 className="bg-[#2c221c] hover:bg-neutral-800 text-stone-300 hover:text-white border border-white/5 px-3.5 rounded-xl text-xs flex items-center justify-center"
+                                title={`Enregistrer méta-données pour ${sec.label}`}
+                                aria-label={`Enregistrer méta-données pour ${sec.label}`}
                               >
                                 Enregistrer
                               </button>
@@ -634,92 +643,119 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
               <form onSubmit={handleSaveGeneral} className="flex flex-col gap-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold">Titre principal d'accroche Hero</label>
+                    <label htmlFor="admin-general-hero-title" className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold block">Titre principal d'accroche Hero</label>
                     <input
                       type="text"
+                      id="admin-general-hero-title"
+                      title="Titre d'accroche principal du Hero"
+                      placeholder="Ex: Quand les lumières baissent..."
                       className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-embers-glow/40 transition-colors"
                       value={generalFields.hero_title}
-                      onChange={(e) => setGeneralFields(prev => ({ ...prev, hero_title: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGeneralFields((prev: any) => ({ ...prev, hero_title: e.target.value }))}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold">Sous-titre d'accroche Hero</label>
+                    <label htmlFor="admin-general-hero-subtitle" className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold block">Sous-titre d'accroche Hero</label>
                     <input
                       type="text"
+                      id="admin-general-hero-subtitle"
+                      title="Sous-titre d'accroche du Hero"
+                      placeholder="Ex: Le Rituel de la Braise Pure"
                       className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-embers-glow/40 transition-colors"
                       value={generalFields.hero_subtitle}
-                      onChange={(e) => setGeneralFields(prev => ({ ...prev, hero_subtitle: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGeneralFields((prev: any) => ({ ...prev, hero_subtitle: e.target.value }))}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold"><Phone className="w-3.5 h-3.5 inline mr-1" /> Numéro de téléphone</label>
+                    <label htmlFor="admin-general-phone" className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold block"><Phone className="w-3.5 h-3.5 inline mr-1" /> Numéro de téléphone</label>
                     <input
                       type="text"
-                      className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none"
+                      id="admin-general-phone"
+                      title="Numéro de téléphone général"
+                      placeholder="Ex: +229 01 96 13 52 87"
+                      className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none font-mono"
                       value={generalFields.phone}
-                      onChange={(e) => setGeneralFields(prev => ({ ...prev, phone: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGeneralFields((prev: any) => ({ ...prev, phone: e.target.value }))}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold"><Clock className="w-3.5 h-3.5 inline mr-1" /> Heures d'ouverture</label>
+                    <label htmlFor="admin-general-hours" className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold block"><Clock className="w-3.5 h-3.5 inline mr-1" /> Heures d'ouverture</label>
                     <input
                       type="text"
+                      id="admin-general-hours"
+                      title="Heures d'ouverture générales du restaurant"
+                      placeholder="Ex: Ouvert tous les jours de 07h à 01h du matin"
                       className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none"
                       value={generalFields.opening_hours}
-                      onChange={(e) => setGeneralFields(prev => ({ ...prev, opening_hours: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGeneralFields((prev: any) => ({ ...prev, opening_hours: e.target.value }))}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5 col-span-1 sm:col-span-2">
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold"><MapPin className="w-3.5 h-3.5 inline mr-1" /> Adresse physique</label>
+                    <label htmlFor="admin-general-address" className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold block"><MapPin className="w-3.5 h-3.5 inline mr-1" /> Adresse physique</label>
                     <input
                       type="text"
+                      id="admin-general-address"
+                      title="Adresse de Nova Grill"
+                      placeholder="Ex: Carrefour Tankpè, Abomey-Calavi, Bénin"
                       className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none"
                       value={generalFields.address}
-                      onChange={(e) => setGeneralFields(prev => ({ ...prev, address: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGeneralFields((prev: any) => ({ ...prev, address: e.target.value }))}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold">Lien de la page TikTok</label>
+                    <label htmlFor="admin-general-tiktok-url" className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold block">Lien de la page TikTok</label>
                     <input
                       type="text"
+                      id="admin-general-tiktok-url"
+                      title="Lien URL de la page TikTok de Nova Grill"
+                      placeholder="Ex: https://www.tiktok.com/@restaurant.nova.grill"
                       className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none"
                       value={generalFields.tiktok_url}
-                      onChange={(e) => setGeneralFields(prev => ({ ...prev, tiktok_url: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGeneralFields((prev: any) => ({ ...prev, tiktok_url: e.target.value }))}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold">Identifiant TikTok (@...)</label>
+                    <label htmlFor="admin-general-tiktok-handle" className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold block">Identifiant TikTok (@...)</label>
                     <input
                       type="text"
+                      id="admin-general-tiktok-handle"
+                      title="Identifiant TikTok"
+                      placeholder="Ex: @restaurant.nova.grill"
                       className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none"
                       value={generalFields.tiktok_handle}
-                      onChange={(e) => setGeneralFields(prev => ({ ...prev, tiktok_handle: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGeneralFields((prev: any) => ({ ...prev, tiktok_handle: e.target.value }))}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold">Abonnés TikTok</label>
+                    <label htmlFor="admin-general-followers" className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold block">Abonnés TikTok</label>
                     <input
                       type="text"
+                      id="admin-general-followers"
+                      title="Nombre d'abonnés TikTok d'affichage"
+                      placeholder="Ex: 11.2K"
                       className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none"
                       value={generalFields.follower_count}
-                      onChange={(e) => setGeneralFields(prev => ({ ...prev, follower_count: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGeneralFields((prev: any) => ({ ...prev, follower_count: e.target.value }))}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold">J'aime TikTok</label>
+                    <label htmlFor="admin-general-likes" className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold block">J'aime TikTok</label>
                     <input
                       type="text"
+                      id="admin-general-likes"
+                      title="Nombre de J'aime TikTok d'affichage"
+                      placeholder="Ex: 131.7K"
                       className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none"
                       value={generalFields.likes_count}
-                      onChange={(e) => setGeneralFields(prev => ({ ...prev, likes_count: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGeneralFields((prev: any) => ({ ...prev, likes_count: e.target.value }))}
                     />
                   </div>
                 </div>
@@ -729,6 +765,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     type="submit"
                     disabled={isSaving}
                     className="bg-white hover:bg-embers-glow text-embers-dark hover:text-white px-6 py-3.5 rounded-xl font-display text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-2"
+                    title="Sauvegarder l'ensemble des réglages généraux"
+                    aria-label="Sauvegarder l'ensemble des réglages généraux"
                   >
                     {isSaving ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
@@ -764,12 +802,14 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   
                   <div className="flex flex-col md:flex-row gap-5 items-stretch">
                     <div className="flex-1 flex flex-col gap-2">
-                      <label className="text-xs text-stone-400">Insérez l'URL directe du fichier vidéo</label>
+                      <label htmlFor="admin-hero-video-url" className="text-xs text-stone-400 block">Insérez l'URL directe du fichier vidéo</label>
                       <input
                         type="text"
+                        id="admin-hero-video-url"
+                        title="URL directe de la vidéo cinématique en arrière-plan"
                         className="w-full bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-stone-300 focus:outline-[#2d221c]"
                         value={heroFields.video_url}
-                        onChange={(e) => setHeroFields(prev => ({ ...prev, video_url: e.target.value }))}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHeroFields((prev: any) => ({ ...prev, video_url: e.target.value }))}
                         placeholder="Ex: https://example.com/braise_fire.mp4"
                       />
                       
@@ -778,6 +818,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           type="file"
                           accept="video/mp4,video/webm"
                           onChange={(e) => handleHeroFileUpload(e, "video_url")}
+                          id="admin-hero-video-file"
+                          title="Sélectionner et téléverser un fichier MP4 local pour la vidéo de couverture"
                           className="hidden"
                           ref={heroVideoFileRef}
                         />
@@ -785,6 +827,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           type="button"
                           onClick={() => heroVideoFileRef.current?.click()}
                           className="w-full bg-stone-900 border border-white/5 hover:border-embers-glow py-3 px-4 rounded-xl text-xs flex justify-center items-center gap-2 text-stone-300 hover:text-white transition-all font-mono"
+                          title="Sélectionner un fichier vidéo local"
+                          aria-label="Sélectionner un fichier vidéo local"
                         >
                           <Upload className="w-4 h-4 text-embers-glow" />
                           <span>CHARGER UN FILM LOCAL</span>
@@ -794,7 +838,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
                     <div className="w-full md:w-48 aspect-video md:aspect-[4/3] rounded-xl overflow-hidden border border-white/5 relative bg-black flex items-center justify-center shrink-0">
                       {heroFields.video_url ? (
-                        <video src={heroFields.video_url} autoPlay muted loop playsInline className="w-full h-full object-cover brightness-75" />
+                        <video src={heroFields.video_url} autoPlay muted loop playsInline className="w-full h-full object-cover brightness-75 animate-fadeIn" />
                       ) : (
                         <span className="text-[10px] font-mono text-zinc-600">Aucun film</span>
                       )}
@@ -808,12 +852,14 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   
                   <div className="flex flex-col md:flex-row gap-5 items-stretch">
                     <div className="flex-1 flex flex-col gap-2">
-                      <label className="text-xs text-stone-400">Insérez l'URL de votre photo ou téléversez-la en bas</label>
+                      <label htmlFor="admin-hero-poster-url" className="text-xs text-stone-400 block">Insérez l'URL de votre photo ou téléversez-la en bas</label>
                       <input
                         type="text"
+                        id="admin-hero-poster-url"
+                        title="URL de l'image de couverture d'arrière-plan de secours"
                         className="w-full bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-stone-300 focus:outline-[#2d221c]"
                         value={heroFields.poster_url}
-                        onChange={(e) => setHeroFields(prev => ({ ...prev, poster_url: e.target.value }))}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHeroFields((prev: any) => ({ ...prev, poster_url: e.target.value }))}
                         placeholder="Ex: https://example.com/embers_photo.png"
                       />
 
@@ -822,6 +868,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           type="file"
                           accept="image/*"
                           onChange={(e) => handleHeroFileUpload(e, "poster_url")}
+                          id="admin-hero-poster-file"
+                          title="Sélectionner et téléverser une image locale pour poster de secours"
                           className="hidden"
                           ref={heroPosterFileRef}
                         />
@@ -829,6 +877,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           type="button"
                           onClick={() => heroPosterFileRef.current?.click()}
                           className="w-full bg-stone-900 border border-white/5 hover:border-embers-glow py-3 px-4 rounded-xl text-xs flex justify-center items-center gap-2 text-stone-300 hover:text-white transition-all font-mono"
+                          title="Sélectionner une image locale"
+                          aria-label="Sélectionner une image locale"
                         >
                           <Upload className="w-4 h-4 text-embers-glow" />
                           <span>CHARGER UNE COUVERTURE LOCALE</span>
@@ -838,7 +888,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
                     <div className="w-full md:w-48 aspect-video md:aspect-[4/3] rounded-xl overflow-hidden border border-white/5 relative bg-black shrink-0">
                       {heroFields.poster_url ? (
-                        <img src={heroFields.poster_url} alt="Fallback Poster" className="w-full h-full object-cover" />
+                        <img src={heroFields.poster_url} alt="Fallback Poster" className="w-full h-full object-cover animate-fadeIn" />
                       ) : (
                         <span className="text-[10px] font-mono text-zinc-600">Aucune image</span>
                       )}
@@ -851,6 +901,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     type="submit"
                     disabled={isSaving}
                     className="bg-white hover:bg-embers-glow text-embers-dark hover:text-white px-6 py-3.5 rounded-xl font-display text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-2"
+                    title="Enregistrer les réglages médias hero"
+                    aria-label="Enregistrer les réglages médias hero"
                   >
                     {isSaving ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
@@ -886,22 +938,26 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-stone-400">Titre descriptif</label>
+                    <label htmlFor="admin-gallery-new-title" className="text-xs text-stone-400 block">Titre descriptif</label>
                     <input
                       type="text"
-                      className="w-full bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white"
+                      id="admin-gallery-new-title"
+                      title="Saisir un titre pour le nouvel élément de galerie"
+                      className="w-full bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none"
                       value={newGalleryItem.title}
-                      onChange={(e) => setNewGalleryItem(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewGalleryItem((prev: any) => ({ ...prev, title: e.target.value }))}
                       placeholder="Ex: Notre Cocktail Mojito d'Or"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-stone-400">Rapport de cadre visual (Aspect Ratio)</label>
+                    <label htmlFor="admin-gallery-new-aspect" className="text-xs text-stone-400 block">Rapport de cadre visual (Aspect Ratio)</label>
                     <select
-                      className="w-full bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white uppercase font-mono"
+                      id="admin-gallery-new-aspect"
+                      title="Saisir le format d’affichage horizontal/vertical de l’élément"
+                      className="w-full bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white uppercase font-mono cursor-pointer focus:outline-none"
                       value={newGalleryItem.aspect}
-                      onChange={(e) => setNewGalleryItem(prev => ({ ...prev, aspect: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setNewGalleryItem((prev: any) => ({ ...prev, aspect: e.target.value }))}
                     >
                       <option value="aspect-square">Carré (1:1)</option>
                       <option value="aspect-[16/10]">Paysage Cine (16:10)</option>
@@ -911,13 +967,15 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </div>
 
                   <div className="flex flex-col gap-1.5 col-span-1 md:col-span-2">
-                    <label className="text-xs text-stone-400">Adresse de média ou téléversement</label>
+                    <label htmlFor="admin-gallery-new-url" className="text-xs text-stone-400 block">Adresse de média ou téléversement</label>
                     <div className="flex gap-3">
                       <input
                         type="text"
-                        className="flex-1 bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white"
+                        id="admin-gallery-new-url"
+                        title="Saisir l'adresse de liaison du média culinaire ou boisson"
+                        className="flex-1 bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none"
                         value={newGalleryItem.media_url}
-                        onChange={(e) => setNewGalleryItem(prev => ({ ...prev, media_url: e.target.value }))}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewGalleryItem((prev: any) => ({ ...prev, media_url: e.target.value }))}
                         placeholder="Insérez un lien de fichier ou chargez-le à côté"
                       />
                       
@@ -925,6 +983,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         type="file"
                         accept="image/*,video/*"
                         onChange={handleGalleryFileUpload}
+                        id="admin-gallery-new-file"
+                        title="Sélectionner un fichier média d'image ou vidéo depuis votre appareil"
                         className="hidden"
                         ref={galleryFileRef}
                       />
@@ -933,9 +993,11 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         onClick={() => galleryFileRef.current?.click()}
                         disabled={galleryUploadProgress}
                         className="bg-stone-850 hover:bg-stone-800 text-stone-300 font-mono text-xs px-4 rounded-xl border border-white/5 shrink-0 flex items-center gap-2"
+                        title="Parcourir un fichier local pour la galerie"
+                        aria-label="Parcourir un fichier local pour la galerie"
                       >
                         {galleryUploadProgress ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5 text-embers-glow" />}
-                        <span>COUPER</span>
+                        <span>CHARGER</span>
                       </button>
                     </div>
                   </div>
@@ -945,6 +1007,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <button
                     type="submit"
                     className="bg-white hover:bg-embers-glow text-embers-dark hover:text-white px-5 py-3 rounded-lg font-display text-[10px] font-bold uppercase tracking-widest transition-all"
+                    title="Valider l’ajout du nouvel item de galerie"
+                    aria-label="Valider l’ajout du nouvel item de galerie"
                   >
                     AJOUTER L'ITEM DE LA RÉTINE
                   </button>
@@ -975,6 +1039,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           disabled={idx === 0}
                           className="p-1 px-1.5 rounded bg-black/40 border border-white/5 hover:border-embers-glow/40 text-stone-400 hover:text-white disabled:opacity-30"
                           title="Déplacer vers la gauche"
+                          aria-label="Déplacer vers la gauche"
                         >
                           <ChevronUp className="w-3 h-3" />
                         </button>
@@ -983,6 +1048,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           disabled={idx === gallery.length - 1}
                           className="p-1 px-1.5 rounded bg-black/40 border border-white/5 hover:border-embers-glow/40 text-stone-400 hover:text-white disabled:opacity-30"
                           title="Déplacer vers la droite"
+                          aria-label="Déplacer vers la droite"
                         >
                           <ChevronDown className="w-3 h-3" />
                         </button>
@@ -992,6 +1058,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         onClick={() => handleDeleteGalleryItem(item.id)}
                         className="p-1.5 rounded bg-rose-950/20 hover:bg-rose-900/30 text-rose-500 hover:text-rose-100 transition-colors border border-rose-900/10"
                         title="Retirer de la galerie"
+                        aria-label="Retirer de la galerie"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -1022,37 +1089,45 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5 col-span-1 md:col-span-2">
-                    <label className="text-xs text-stone-400">Titre de la vidéo d'ambiance</label>
+                    <label htmlFor="admin-event-new-title" className="text-xs text-stone-400 block">Titre de la vidéo d'ambiance</label>
                     <input
                       type="text"
-                      className="w-full bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white"
+                      id="admin-event-new-title"
+                      title="Saisir un titre pour la vidéo d'événement en live"
+                      className="w-full bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none"
                       value={newEventVideo.title}
-                      onChange={(e) => setNewEventVideo(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewEventVideo((prev: any) => ({ ...prev, title: e.target.value }))}
                       placeholder="Ex: Session Amapiano Live du Samedi Noir"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-stone-400">URL du fichier vidéo (.mp4) ou charger</label>
+                    <label htmlFor="admin-event-new-url" className="text-xs text-stone-400 block">URL du fichier vidéo (.mp4) ou charger</label>
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        className="flex-1 bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white"
+                        id="admin-event-new-url"
+                        title="Saisir l'adresse de liaison du fichier vidéo mp4/webm"
+                        className="flex-1 bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none"
                         value={newEventVideo.video_url}
-                        onChange={(e) => setNewEventVideo(prev => ({ ...prev, video_url: e.target.value }))}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewEventVideo((prev: any) => ({ ...prev, video_url: e.target.value }))}
                         placeholder="Insérez un lien de fichier vidéo"
                       />
                       <input
                         type="file"
                         accept="video/mp4,video/webm"
                         onChange={(e) => handleEventVideoUpload(e, "video_url")}
+                        id="admin-event-new-file"
+                        title="Sélectionner le fichier vidéo local d'événement live"
                         className="hidden"
                         ref={eventVideoFileRef}
                       />
                       <button
                         type="button"
                         onClick={() => eventVideoFileRef.current?.click()}
-                        className="bg-stone-850 hover:bg-stone-800 text-stone-400 p-2.5 rounded-xl border border-white/5 shrink-0"
+                        className="bg-stone-850 hover:bg-stone-800 text-stone-400 p-2.5 rounded-xl border border-white/5 shrink-0 flex items-center justify-center h-10 w-10"
+                        title="Sélectionner vidéo d'événement locale"
+                        aria-label="Sélectionner vidéo d'événement locale"
                       >
                         <Upload className="w-4 h-4" />
                       </button>
@@ -1060,26 +1135,32 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-stone-400">Image poster miniature (Optionnel)</label>
+                    <label htmlFor="admin-event-new-thumbnail" className="text-xs text-stone-400 block">Image poster miniature (Optionnel)</label>
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        className="flex-1 bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white"
+                        id="admin-event-new-thumbnail"
+                        title="Saisir l'adresse d'illustration de couverture alternative"
+                        className="flex-1 bg-[#0B0908] border border-white/5 rounded-xl px-4 py-3 text-xs text-white focus:outline-none"
                         value={newEventVideo.thumbnail_url}
-                        onChange={(e) => setNewEventVideo(prev => ({ ...prev, thumbnail_url: e.target.value }))}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewEventVideo((prev: any) => ({ ...prev, thumbnail_url: e.target.value }))}
                         placeholder="Ex: https://example.com/cover.jpg"
                       />
                       <input
                         type="file"
                         accept="image/*"
                         onChange={(e) => handleEventVideoUpload(e, "thumbnail_url")}
+                        id="admin-event-new-thumbnail-file"
+                        title="Sélectionner l'image de couverture locale depuis vos dossiers"
                         className="hidden"
                         ref={eventThumbnailFileRef}
                       />
                       <button
                         type="button"
                         onClick={() => eventThumbnailFileRef.current?.click()}
-                        className="bg-stone-850 hover:bg-stone-800 text-stone-400 p-2.5 rounded-xl border border-white/5 shrink-0"
+                        className="bg-stone-850 hover:bg-stone-800 text-stone-400 p-2.5 rounded-xl border border-white/5 shrink-0 flex items-center justify-center h-10 w-10"
+                        title="Sélectionner image de couverture locale"
+                        aria-label="Sélectionner image de couverture locale"
                       >
                         <Upload className="w-4 h-4" />
                       </button>
@@ -1091,6 +1172,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <button
                     type="submit"
                     className="bg-white hover:bg-rose-600 text-black hover:text-white px-5 py-3 rounded-lg font-display text-[10px] font-bold uppercase tracking-widest transition-all"
+                    title="Sauvegarder et publier l'ambiance live d'événement"
+                    aria-label="Sauvegarder et publier l'ambiance live d'événement"
                   >
                     METTRE EN LIGNE LE CLIP D'AMBIANCE
                   </button>
@@ -1113,6 +1196,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <button
                       onClick={() => handleDeleteEventVideo(video.id)}
                       className="p-2 rounded bg-rose-950/20 hover:bg-rose-900/30 text-rose-500 border border-rose-900/10"
+                      title="Supprimer cette vidéo d'ambiance"
+                      aria-label="Supprimer cette vidéo d'ambiance"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -1169,13 +1254,13 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
               {/* SQL Panel */}
               <div className="flex flex-col gap-2">
-                <label className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold">SCRIPT INITIALISATION SQL (tables + security rules RLS)</label>
+                <span className="font-mono text-[9px] uppercase tracking-widest text-[#a89689] font-bold">SCRIPT INITIALISATION SQL (tables + security rules RLS)</span>
                 <div className="bg-[#0B0908] border border-white/5 rounded-2xl p-5 relative overflow-hidden select-text">
                   <pre className="font-mono text-[10px] text-stone-400 overflow-x-auto select-all leading-normal">
 {`-- SQL DE PROVISIONNEMENT POUR NOVA GRILL
 
 -- 1. Create table site_settings
-create table if nulls not exists public.site_settings (
+create table if not exists public.site_settings (
   id integer primary key default 1,
   hero_title text not null default 'Quand les lumières baissent...',
   hero_subtitle text not null default 'Le Rituel de la Braise Pure',
@@ -1190,7 +1275,7 @@ create table if nulls not exists public.site_settings (
 );
 
 -- 2. Create table gallery_items
-create table if nulls not exists public.gallery_items (
+create table if not exists public.gallery_items (
   id text primary key,
   type text not null default 'image',
   title text not null,
@@ -1201,7 +1286,7 @@ create table if nulls not exists public.gallery_items (
 );
 
 -- 3. Create table hero_media
-create table if nulls not exists public.hero_media (
+create table if not exists public.hero_media (
   id text primary key default 'hero-1',
   video_url text not null,
   poster_url text not null,
@@ -1210,7 +1295,7 @@ create table if nulls not exists public.hero_media (
 );
 
 -- 4. Create table event_videos
-create table if nulls not exists public.event_videos (
+create table if not exists public.event_videos (
   id text primary key,
   title text not null,
   video_url text not null,

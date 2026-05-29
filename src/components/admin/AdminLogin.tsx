@@ -49,6 +49,9 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }: AdminLoginP
           setIsLoading(false);
         }
       } else {
+        if (!supabase) {
+          throw new Error("Supabase n'est pas configuré.");
+        }
         // Live Supabase Authenticate
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
